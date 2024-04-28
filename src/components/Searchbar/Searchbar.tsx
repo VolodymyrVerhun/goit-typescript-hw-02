@@ -1,17 +1,23 @@
-import React, { ChangeEvent, FormEvent } from "react";
+import React, { ChangeEvent, FormEvent, useState } from "react";
 import style from "./Searchbar.module.css";
 
 interface SearchBarProps {
-  handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  handleSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  value: string;
+  onSubmit: (value: string) => void;
 }
 
-const Searchbar: React.FC<SearchBarProps> = ({
-  handleChange,
-  handleSubmit,
-  value,
-}) => {
+const Searchbar: React.FC<SearchBarProps> = ({ onSubmit }) => {
+  const [searchImage, setSearchImage] = useState<string>("");
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchImage(e.target.value);
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    onSubmit(searchImage);
+    setSearchImage("");
+  };
   return (
     <header className={style.searchbar}>
       <form className={style.searchForm} onSubmit={handleSubmit}>
@@ -26,7 +32,6 @@ const Searchbar: React.FC<SearchBarProps> = ({
           autoComplete="off"
           autoFocus
           placeholder="Search images and photos"
-          value={value}
         />
       </form>
     </header>

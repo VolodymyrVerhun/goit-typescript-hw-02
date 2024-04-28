@@ -1,8 +1,5 @@
+import { Image } from "../../App.types";
 import style from "./Modal.module.css";
-
-interface Image {
-  largeImageURL: string;
-}
 
 interface ModalProps {
   image: Image;
@@ -10,7 +7,6 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ image, toggleModal }) => {
-  console.log("image: ", image);
   return (
     <div onClick={toggleModal} className={style.overlay}>
       <div className={style.modal}>

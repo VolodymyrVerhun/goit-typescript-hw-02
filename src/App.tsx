@@ -1,32 +1,54 @@
 import Searchbar from "./components/Searchbar/Searchbar";
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import style from "./App.module.css";
 import ImageGallery from "./components/ImageGallery/ImageGallery";
+import { getImage } from "./components/services/getImage";
+import Button from "./components/Button/Button";
+import { ColorRing } from "react-loader-spinner";
+import { Image } from "./App.types";
 
 export default function App() {
-  const [value, setValue] = useState<string>("");
   const [searchImage, setSearchImage] = useState<string>("");
+  const [imageList, setImageList] = useState<Image[]>([]);
+  const [isLoadng, setIsLoadng] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(false);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setValue(event.target.value);
-  };
-  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
+  useEffect(() => {
+    if (!searchImage) return;
+    const fetchImageData = async () => {
+      setIsLoadng(true);
+      try {
+        const imageData = await getImage(searchImage, page);
 
-    handleSearch(value);
+        setImageList((prevState) => [...prevState, ...imageData.hits]);
+        setHasMore(imageData.total > imageData.hits.length);
+      } catch (error) {
+        console.error("Error fetching image data: ", error);
+      } finally {
+        setIsLoadng(false);
+      }
+    };
+
+    fetchImageData();
+  }, [searchImage, page]);
+
+  const handleSubmit = (value: string): void => {
+    setSearchImage(value);
+    setImageList([]);
+    setPage(1);
   };
-  const handleSearch = (searchImage: string): void => {
-    setSearchImage(searchImage);
+
+  const onLoadMore = (): void => {
+    setPage((prevState) => prevState + 1);
   };
 
   return (
     <div className={style.app}>
-      <Searchbar
-        handleChange={handleChange}
-        handleSubmit={handleSubmit}
-        value={value}
-      />
-      <ImageGallery searchImage={searchImage} />
+      <Searchbar onSubmit={handleSubmit} />
+      {isLoadng && <ColorRing />}
+      <ImageGallery imageList={imageList} />
+      {hasMore && <Button submit={onLoadMore} />}
     </div>
   );
 }

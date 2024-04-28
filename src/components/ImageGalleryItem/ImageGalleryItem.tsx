@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import style from "./ImageGalleryItem.module.css";
 import Modal from "../../components/Modal/Modal";
-
-interface Image {
-  webformatURL: string;
-  tags: string;
-  largeImageURL: string;
-}
+import { Image } from "../../App.types";
 
 interface ImageGalleryItemProps {
   image: Image;
